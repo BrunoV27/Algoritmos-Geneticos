@@ -1,5 +1,9 @@
 function [Matriz_tasa_falla_acoples, Matriz_tiempo_interrupcion_acoples, Matriz_indisponibilidad_acoples, Matriz_kvai_acoples]=matrices_acoples(Npob,Ntr,cant_ramales,M,tasa_falla,Tsi,TTi,TRi,Ady,Li,grafo1,mejores_tele_acoples,bloques)
-[~,cant_bloques]=size(bloques);
+cant_bloques=zeros(1,Npob);
+for k=1:Npob
+    existen=~cellfun(@isempty, bloques(k,:));
+    cant_bloques(k)=sum(existen);
+end
 Matriz_tasa_falla_acoples=zeros(Ntr,Ntr,Npob,3);
 Matriz_tiempo_interrupcion_acoples=zeros(Ntr,Ntr,Npob,3);
 Matriz_indisponibilidad_acoples=zeros(Ntr,Ntr,Npob,3);
@@ -12,8 +16,8 @@ for k=1:Npob
     for m=1:3 % 1 2 o 3 NA
         M_acoples(:,:,k,m)=M(:,:,k);
         if mejores_tele_acoples{k}{2}(m) > 0 %Solo si tiene energia restablecida por los acoples nos interesa
-            for b1=1:cant_bloques            %bloque en falla
-                for b2=1:cant_bloques
+            for b1=1:cant_bloques(k)            %bloque en falla
+                for b2=1:cant_bloques(k)
                     if b2 > b1 && mejores_tele_acoples{k}{3}(b1,b2,m) == 0
                         indices=bloques{k,b1} <= Ntr-cant_ramales; %Troncales del tramo en falla
                         troncales=bloques{k,b1}(indices);
